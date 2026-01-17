@@ -3,21 +3,39 @@ trigger: none
 pool: Mera pool
 
 stages:
-  - stage: Build 
+  - stage: Build
     jobs:
-      - job:
+      - job: BuildJob
         steps:
-        - task: PowerShell@2
-          inputs:
-            targetType: 'inline'
-            script: 'mvn clean package'
-            workingDirectory: '$(System.DefaultWorkingDirectory)'
+          - task: PowerShell@2
+            inputs:
+              targetType: 'inline'
+              script: 'mvn clean package'
+              workingDirectory: '$(System.DefaultWorkingDirectory)'
 
-        - task: PublishPipelineArtifact@1
-          inputs:
-            targetPath: '$(Pipeline.Workspace)'
-            artifact: 'java-artifact'
-            publishLocation: 'pipeline'
-          
-  
+          - task: PublishPipelineArtifact@1
+            inputs:
+              targetPath: '$(Pipeline.Workspace)'
+              artifact: 'java-artifact'
+              publishLocation: 'pipeline'
 
+  - stage: Deploy
+    jobs:
+      - deployment: JavaApplication
+        environment:
+          name: Saurav-tst
+          resourceType: virtualMachine
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - task: DownloadPipelineArtifact@2
+                  inputs:
+                    buildType: 'current'
+                    artifactName: 'java-artifact'
+                    targetPath: '$(Pipeline.Workspace)/artifact'
+
+                - task: Bash@3
+                  inputs:
+                    targetType: 'inline'
+                    script: 'sudo cp $(System.DefaultWorkingDirectory)/artifact/target/*.war /opt/tomcat/webapps/'
