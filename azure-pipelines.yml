@@ -23,7 +23,7 @@ stages:
     jobs:
       - deployment: JavaApplication
         environment:
-          name: Saurav-tst
+          name: sidEnv
           resourceType: virtualMachine
         strategy:
           runOnce:
@@ -35,8 +35,8 @@ stages:
                     artifactName: 'java-artifact'
                     targetPath: '$(Pipeline.Workspace)/artifact'
 
-                - task: Bash@3
-                  inputs:
-                    targetType: 'inline'
-                    script: 'sudo cp $(Pipeline.Workspace)/artifact/java-artifact/s/target/JavaLoginShowcase-1.0.0.war /opt/tomcat/webapps/'
+                # - task: Bash@3
+                #   inputs:
+                #     targetType: 'inline'
+                #     script: 'sudo cp $(Pipeline.Workspace)/artifact/java-artifact/s/target/JavaLoginShowcase-1.0.0.war /opt/tomcat/webapps/'
 
